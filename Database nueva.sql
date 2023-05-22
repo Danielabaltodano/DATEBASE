@@ -8,7 +8,9 @@ CREATE TABLE [Empleado] (
   [ID_Empleado] INT IDENTITY(1,1) PRIMARY KEY,
   [Nombre] VARCHAR(15),
   [Apellido] VARCHAR(15),
-  [Telefono] int
+  [Telefono] int,
+  [usuario] varchar (15),
+  [Contraseña] int
 )
 GO
 
@@ -87,8 +89,36 @@ ALTER TABLE [DetalleReservacion] ADD FOREIGN KEY ([N_de_habitacion]) REFERENCES 
 GO
 
 
+USE[DB_HotelMilenio]
+GO
+CREATE PROCEDURE MostrarClientes
+AS
+BEGIN
+    SELECT * FROM Cliente;
+END
 
 
+
+--------------------------------
+USE [DB_HotelMilenio]
+GO
+CREATE PROCEDURE [dbo].[ConsultarClientes]
+    @dato VARCHAR(50)
+AS
+BEGIN
+    SELECT ID_cliente, Cedula_cliente, Nombre1, Nombre2, Apellido1, Apellido2, Procedencia, Telefono
+    FROM cliente
+    WHERE Cedula_cliente LIKE '%' + RTRIM(@dato) + '%'
+        OR Nombre1 LIKE '%' + RTRIM(@dato) + '%'
+        OR Nombre2 LIKE '%' + RTRIM(@dato) + '%'
+        OR Apellido1 LIKE '%' + RTRIM(@dato) + '%'
+        OR Apellido2 LIKE '%' + RTRIM(@dato) + '%';
+END
+--------------------------------------------------------------------
+
+
+USE [DB_HotelMilenio]
+GO
 CREATE PROCEDURE InsertarCliente
     @ID_cliente INT,
     @Cedula_cliente NCHAR(15),
@@ -104,29 +134,34 @@ BEGIN
     VALUES (@ID_cliente, @Cedula_cliente, @Nombre1, @Nombre2, @Apellido1, @Apellido2, @Procedencia, @Telefono)
 END
 
-CREATE PROCEDURE ActualizarCliente
-    @ID_cliente INT,
-    @Cedula_cliente NCHAR(15),
-    @Nombre1 VARCHAR(15),
-    @Nombre2 VARCHAR(15),
-    @Apellido1 VARCHAR(15),
-    @Apellido2 VARCHAR(15),
-    @Procedencia VARCHAR(40),
-    @Telefono INT
+--------------------------------------------------------------------------
+USE [DB_HotelMilenio]
+GO
+CREATE PROCEDURE [dbo].[ModificarCliente]
+@ID_cliente INT,
+@Cedula_cliente NCHAR(15),
+@Nombre1 VARCHAR(15),
+@Nombre2 VARCHAR(15),
+@Apellido1 VARCHAR(15),
+@Apellido2 VARCHAR(15),
+@Procedencia VARCHAR(40),
+@Telefono INT
 AS
 BEGIN
-    UPDATE Cliente
-    SET Cedula_cliente = @Cedula_cliente,
-        Nombre1 = @Nombre1,
-        Nombre2 = @Nombre2,
-        Apellido1 = @Apellido1,
-        Apellido2 = @Apellido2,
-        Procedencia = @Procedencia,
-        Telefono = @Telefono
-    WHERE ID_cliente = @ID_cliente
+UPDATE Cliente SET
+    Cedula_cliente = @Cedula_cliente,
+    Nombre1 = @Nombre1,
+    Nombre2 = @Nombre2,
+    Apellido1 = @Apellido1,
+    Apellido2 = @Apellido2,
+    Procedencia = @Procedencia,
+    Telefono = @Telefono
+WHERE ID_cliente = @ID_cliente
 END
 
-
+-------------------------------------------------------------------------
+USE [DB_HotelMilenio]
+GO
 CREATE PROCEDURE EliminarCliente
     @ID_cliente INT
 AS
@@ -136,15 +171,17 @@ BEGIN
 END
 
 
-
+--------------------------------------------------
 CREATE PROCEDURE InsertarEmpleado
     @Nombre VARCHAR(15),
     @Apellido VARCHAR(15),
-    @Telefono INT
+    @Telefono INT,
+	@usuario varchar(15),
+	@Contraseña int
 AS
 BEGIN
-    INSERT INTO Empleado (Nombre, Apellido, Telefono)
-    VALUES (@Nombre, @Apellido, @Telefono);
+    INSERT INTO Empleado (Nombre, Apellido, Telefono, usuario,contraseña)
+    VALUES (@Nombre, @Apellido, @Telefono,@usuario,@Contraseña);
 END
 
 
@@ -152,11 +189,13 @@ CREATE PROCEDURE ActualizarEmpleado
     @ID_Empleado INT,
     @Nombre VARCHAR(15),
     @Apellido VARCHAR(15),
-    @Telefono INT
+    @Telefono INT,
+	@usuario varchar(15),
+	@Contraseña int
 AS
 BEGIN
     UPDATE Empleado
-    SET Nombre = @Nombre, Apellido = @Apellido, Telefono = @Telefono
+    SET Nombre = @Nombre, Apellido = @Apellido, Telefono = @Telefono, usuario = @usuario, Contraseña = @Contraseña
     WHERE ID_Empleado = @ID_Empleado;
 END
 
